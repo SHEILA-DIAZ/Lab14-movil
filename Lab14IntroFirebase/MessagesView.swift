@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MessagesView: View {
+    let userID: String
     let signOut: () -> Void
     @StateObject private var databaseService = DatabaseService()
     @State private var newMessage = ""
@@ -12,47 +13,71 @@ struct MessagesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(spacing: 12) {
+                Image(systemName: "bubble.left.and.bubble.right.fill")
+                    .font(.title2)
+                    .accessibilityHidden(true)
                 Text("Messages")
-                    .font(.title.bold())
-                Spacer()
+                    .font(.title2.bold())
+                    .accessibilityAddTraits(.isHeader)
+                Spacer(minLength: 4)
                 Button("Sign Out", action: signOut)
                     .buttonStyle(SignOutButtonStyle())
             }
-            .padding()
+            .foregroundStyle(.white)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(ChatTheme.banner)
 
-            List(databaseService.messages) { message in
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(message.text)
-                    HStack {
-                        Text(message.userEmail)
-                        Spacer()
-                        Text(message.timestamp, style: .time)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(databaseService.messages) { message in
+                            messageBubble(message)
+                        }
                     }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .padding(16)
                 }
-                .padding(.vertical, 2)
-            }
-            .overlay {
-                if databaseService.messages.isEmpty {
-                    ContentUnavailableView("No messages yet", systemImage: "bubble.left")
-                        .allowsHitTesting(false)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: databaseService.messages.last?.id, initial: true) { _, lastID in
+                    if let lastID {
+                        proxy.scrollTo(lastID, anchor: .bottom)
+                    }
+                }
+                .overlay {
+                    if databaseService.messages.isEmpty {
+                        ContentUnavailableView("No messages yet", systemImage: "bubble.left")
+                            .allowsHitTesting(false)
+                    }
                 }
             }
 
-            HStack {
+            HStack(spacing: 10) {
                 TextField("Type a message...", text: $newMessage)
-                    .textFieldStyle(.roundedBorder)
+                    .padding(.horizontal, 14)
+                    .frame(minHeight: 44)
+                    .background(ChatTheme.canvas, in: Capsule())
                     .disabled(isSending)
                     .accessibilityIdentifier("messages.input")
                     .submitLabel(.send)
                     .onSubmit(send)
-                Button("Send", action: send)
-                    .disabled(messageText.isEmpty || isSending)
+                Button(action: send) {
+                    Image(systemName: "arrow.up")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
+                        .background(ChatTheme.banner, in: Circle())
+                        .opacity(messageText.isEmpty || isSending ? 0.45 : 1)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Send")
+                .disabled(messageText.isEmpty || isSending)
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(.background)
         }
+        .background(ChatTheme.canvas.ignoresSafeArea())
         .onAppear(perform: databaseService.startListening)
         .onDisappear(perform: databaseService.stopListening)
         .alert("Messages", isPresented: Binding(
@@ -63,6 +88,33 @@ struct MessagesView: View {
         } message: {
             Text(databaseService.errorMessage ?? "")
         }
+    }
+
+    private func messageBubble(_ message: Message) -> some View {
+        let isOwn = message.senderID == userID
+
+        return HStack {
+            if isOwn { Spacer(minLength: 32) }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(message.userEmail)
+                    .font(.caption.weight(.semibold))
+                Text(message.text)
+                    .font(.body)
+                Text(message.timestamp, style: .time)
+                    .font(.caption2.monospacedDigit())
+            }
+            .foregroundStyle(isOwn ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(
+                isOwn ? AnyShapeStyle(ChatTheme.banner) : AnyShapeStyle(.background),
+                in: RoundedRectangle(cornerRadius: 18)
+            )
+
+            if !isOwn { Spacer(minLength: 32) }
+        }
+        .id(message.id)
     }
 
     private func send() {

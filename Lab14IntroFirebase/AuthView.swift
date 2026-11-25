@@ -13,41 +13,12 @@ struct AuthView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Text("Lab 14: Firebase")
-                    .font(.largeTitle.bold())
-                    .padding(.top, 50)
+            Group {
                 if let userID {
-                    MessagesView(signOut: signOut)
+                    MessagesView(userID: userID, signOut: signOut)
                         .id(userID)
                 } else {
-                    Spacer()
-                    VStack(spacing: 15) {
-                        TextField("Email", text: $email)
-                            .textContentType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .keyboardType(.emailAddress)
-                            .accessibilityIdentifier("auth.email")
-                        SecureField("Password", text: $password)
-                            .accessibilityIdentifier("auth.password")
-                        HStack(spacing: 20) {
-                            Button("Sign In", action: signIn)
-                                .buttonStyle(PrimaryButtonStyle())
-                            Button("Sign Up", action: signUp)
-                                .buttonStyle(SecondaryButtonStyle())
-                        }
-                        .disabled(isSubmitting)
-                        if FirebaseApp.app() == nil {
-                            Text("Agrega el GoogleService-Info.plist de App01-Lab14 para conectar Firebase.")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                    }
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal, 30)
-                    Spacer()
+                    signInForm
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -64,6 +35,78 @@ struct AuthView: View {
                 self.authStateListener = nil
             }
         }
+    }
+
+    private var signInForm: some View {
+        ScrollView {
+            VStack(spacing: 22) {
+                VStack(spacing: 12) {
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.system(size: 42, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .accessibilityHidden(true)
+                    Text("Lab 14: Firebase")
+                        .font(.largeTitle.bold())
+                        .accessibilityAddTraits(.isHeader)
+                    Text("Sign in to join the conversation.")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 36)
+                .padding(.horizontal, 16)
+                .background(ChatTheme.banner, in: RoundedRectangle(cornerRadius: 30))
+
+                VStack(alignment: .leading, spacing: 14) {
+                    LabeledContent {
+                        TextField("Email", text: $email)
+                            .textContentType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.emailAddress)
+                            .accessibilityIdentifier("auth.email")
+                    } label: {
+                        Image(systemName: "envelope").accessibilityHidden(true)
+                    }
+                    .modifier(ChatFieldStyle())
+
+                    LabeledContent {
+                        SecureField("Password", text: $password)
+                            .accessibilityIdentifier("auth.password")
+                    } label: {
+                        Image(systemName: "lock").accessibilityHidden(true)
+                    }
+                    .modifier(ChatFieldStyle())
+
+                    Button("Sign In", action: signIn)
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(isSubmitting)
+                    Button("Sign Up", action: signUp)
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(isSubmitting)
+
+                    if FirebaseApp.app() == nil {
+                        Text("Agrega el GoogleService-Info.plist de App01-Lab14 para conectar Firebase.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(20)
+                .background(.background, in: RoundedRectangle(cornerRadius: 26))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 26)
+                        .strokeBorder(.indigo.opacity(0.18))
+                        .allowsHitTesting(false)
+                }
+            }
+            .frame(maxWidth: 460)
+            .padding(24)
+            .frame(maxWidth: .infinity)
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .background(ChatTheme.canvas.ignoresSafeArea())
     }
 
     private func checkAuthState() {
@@ -141,8 +184,9 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(.white)
-            .padding()
-            .background(.blue, in: RoundedRectangle(cornerRadius: 10))
+            .font(.headline)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .background(ChatTheme.banner, in: RoundedRectangle(cornerRadius: 16))
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
     }
 }
@@ -150,9 +194,10 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(.blue)
-            .padding()
-            .overlay(RoundedRectangle(cornerRadius: 10).stroke(.blue, lineWidth: 2))
+            .font(.headline)
+            .foregroundStyle(Color.indigo)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .background(.indigo.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
     }
 }
@@ -161,8 +206,29 @@ struct SignOutButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(.white)
-            .padding(10)
-            .background(.red, in: RoundedRectangle(cornerRadius: 10))
+            .font(.subheadline.weight(.semibold))
+            .padding(.horizontal, 13)
+            .frame(minHeight: 44)
+            .background(.white.opacity(0.19), in: Capsule())
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
+    }
+}
+
+enum ChatTheme {
+    static let banner = LinearGradient(
+        colors: [Color(red: 0.20, green: 0.16, blue: 0.66), Color(red: 0.57, green: 0.15, blue: 0.58)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    static let canvas = Color.indigo.opacity(0.07)
+}
+
+private struct ChatFieldStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .foregroundStyle(Color.indigo)
+            .multilineTextAlignment(.leading)
+            .padding(14)
+            .background(ChatTheme.canvas, in: RoundedRectangle(cornerRadius: 14))
     }
 }

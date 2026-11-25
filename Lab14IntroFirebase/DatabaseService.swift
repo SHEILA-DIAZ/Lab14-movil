@@ -7,6 +7,7 @@ struct Message: Identifiable, Codable {
     let id: String
     let text: String
     let userEmail: String
+    let senderID: String?
     let timestamp: Date
 
     init?(document: QueryDocumentSnapshot) {
@@ -17,6 +18,7 @@ struct Message: Identifiable, Codable {
         id = document.documentID
         self.text = text
         self.userEmail = userEmail
+        senderID = data["uid"] as? String
         self.timestamp = timestamp.dateValue()
     }
 }
