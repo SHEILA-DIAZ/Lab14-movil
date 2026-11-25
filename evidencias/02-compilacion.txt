@@ -1,0 +1,6 @@
+  Firebase: https://github.com/firebase/firebase-ios-sdk @ 12.14.0
+    Target 'Lab14IntroFirebase' in project 'Lab14IntroFirebase'
+    Target 'FirebaseDatabase' in project 'Firebase'
+    Target 'FirebaseAuth' in project 'Firebase'
+    Target 'FirebaseCore' in project 'Firebase'
+** BUILD SUCCEEDED **
