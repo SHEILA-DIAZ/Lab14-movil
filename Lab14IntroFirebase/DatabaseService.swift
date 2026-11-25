@@ -1,8 +1,7 @@
-import FirebaseAuth
-import FirebaseCore
-import FirebaseDatabase
-import Foundation
 import Combine
+import FirebaseAuth
+import FirebaseFirestore
+import Foundation
 
 struct Message: Identifiable, Codable {
     let id: String
@@ -10,15 +9,15 @@ struct Message: Identifiable, Codable {
     let userEmail: String
     let timestamp: Date
 
-    init?(snapshot: DataSnapshot) {
-        guard let value = snapshot.value as? [String: Any],
-              let text = value["text"] as? String,
-              let userEmail = value["userEmail"] as? String,
-              let timestamp = value["timestamp"] as? Double else { return nil }
-        id = snapshot.key
+    init?(document: QueryDocumentSnapshot) {
+        let data = document.data(with: .estimate)
+        guard let text = data["text"] as? String,
+              let userEmail = data["userEmail"] as? String,
+              let timestamp = data["timestamp"] as? Timestamp else { return nil }
+        id = document.documentID
         self.text = text
         self.userEmail = userEmail
-        self.timestamp = Date(timeIntervalSince1970: timestamp / 1_000)
+        self.timestamp = timestamp.dateValue()
     }
 }
 
@@ -26,50 +25,36 @@ struct Message: Identifiable, Codable {
 final class DatabaseService: ObservableObject {
     @Published private(set) var messages: [Message] = []
     @Published var errorMessage: String?
-    private var query: DatabaseQuery?
-    private var observer: DatabaseHandle?
+    private var listener: ListenerRegistration?
     private var subscription = UUID()
 
-    private var reference: DatabaseReference? {
-        guard let url = FirebaseApp.app()?.options.databaseURL, !url.isEmpty else { return nil }
-        return Database.database(url: url).reference().child("messages")
+    private var collection: CollectionReference {
+        Firestore.firestore().collection("messages")
     }
 
     func startListening() {
-        guard observer == nil else { return }
-        guard let reference else {
-            errorMessage = "GoogleService-Info.plist must include the Realtime Database URL."
-            return
-        }
+        guard listener == nil else { return }
         let subscription = UUID()
         self.subscription = subscription
-        let query = reference.queryOrdered(byChild: "timestamp").queryLimited(toLast: 100)
-        self.query = query
-        observer = query.observe(.value, with: { [weak self] snapshot in
-            let messages = snapshot.children.compactMap { child -> Message? in
-                guard let child = child as? DataSnapshot else { return nil }
-                return Message(snapshot: child)
+        listener = collection.order(by: "timestamp").limit(toLast: 100)
+            .addSnapshotListener { [weak self] snapshot, error in
+                let messages = snapshot?.documents.compactMap(Message.init(document:))
+                DispatchQueue.main.async {
+                    guard let self, self.subscription == subscription else { return }
+                    if let error {
+                        self.stopListening()
+                        self.errorMessage = error.localizedDescription
+                    } else if let messages {
+                        self.messages = messages
+                    }
+                }
             }
-            DispatchQueue.main.async {
-                guard let self, self.subscription == subscription else { return }
-                self.messages = messages
-            }
-        }, withCancel: { [weak self] error in
-            DispatchQueue.main.async {
-                guard let self, self.subscription == subscription else { return }
-                self.stopListening()
-                self.errorMessage = error.localizedDescription
-            }
-        })
     }
 
     func stopListening() {
-        if let observer {
-            query?.removeObserver(withHandle: observer)
-        }
+        listener?.remove()
+        listener = nil
         subscription = UUID()
-        observer = nil
-        query = nil
         messages = []
     }
 
@@ -77,24 +62,19 @@ final class DatabaseService: ObservableObject {
         guard let user = Auth.auth().currentUser, let email = user.email else {
             throw MessageError.sessionRequired
         }
-        guard let reference else { throw MessageError.databaseUnavailable }
-        try await reference.childByAutoId().setValue([
+        try await collection.document().setData([
             "text": text,
             "userEmail": email,
             "uid": user.uid,
-            "timestamp": ServerValue.timestamp()
+            "timestamp": FieldValue.serverTimestamp()
         ])
     }
 
     private enum MessageError: LocalizedError {
         case sessionRequired
-        case databaseUnavailable
 
         var errorDescription: String? {
-            switch self {
-            case .sessionRequired: "Sign in before sending messages."
-            case .databaseUnavailable: "The Realtime Database URL is missing."
-            }
+            "Sign in before sending messages."
         }
     }
 }

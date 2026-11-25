@@ -15,7 +15,7 @@
  00000000000000000000000A = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/firebase/firebase-ios-sdk"; requirement = {kind = exactVersion; version = 12.14.0; }; };
  00000000000000000000000B = {isa = XCSwiftPackageProductDependency; package = 00000000000000000000000A; productName = FirebaseCore; };
  00000000000000000000000C = {isa = XCSwiftPackageProductDependency; package = 00000000000000000000000A; productName = FirebaseAuth; };
- 00000000000000000000000D = {isa = XCSwiftPackageProductDependency; package = 00000000000000000000000A; productName = FirebaseDatabase; };
+ 00000000000000000000000D = {isa = XCSwiftPackageProductDependency; package = 00000000000000000000000A; productName = FirebaseFirestore; };
  00000000000000000000000E = {isa = PBXBuildFile; productRef = 00000000000000000000000B; };
  00000000000000000000000F = {isa = PBXBuildFile; productRef = 00000000000000000000000C; };
  000000000000000000000010 = {isa = PBXBuildFile; productRef = 00000000000000000000000D; };
