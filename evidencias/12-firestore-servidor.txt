@@ -1,3 +1,5 @@
+Verificación final después de publicar firestore.rules
+
 Lectura anónima · HTTP 403
 Registro de cuenta a · HTTP 200
 Contraseña incorrecta de cuenta a · HTTP 400
@@ -15,4 +17,5 @@ Lectura cruzada del mensaje de cuenta b · HTTP 200
 Correo y UID del mensaje de cuenta b coinciden con Authentication
 Modificar mensaje propio · HTTP 403
 Eliminar mensaje propio · HTTP 403
-Suplantación de correo · HTTP 200
+Suplantación de correo · HTTP 403
+Suplantación de UID · HTTP 403
