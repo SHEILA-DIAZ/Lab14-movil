@@ -1,0 +1,29 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "messages": {
+      ".read": "auth != null",
+      ".indexOn": ["timestamp"],
+      "$message": {
+        ".write": "auth != null && !data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['text', 'uid', 'userEmail', 'timestamp'])",
+        "text": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500 && newData.val().matches(/[\\s\\S]*\\S[\\s\\S]*/)"
+        },
+        "uid": {
+          ".validate": "newData.isString() && newData.val() == auth.uid"
+        },
+        "userEmail": {
+          ".validate": "newData.isString() && newData.val() == auth.token.email"
+        },
+        "timestamp": {
+          ".validate": "newData.isNumber() && newData.val() == now"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
