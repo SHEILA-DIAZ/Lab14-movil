@@ -15,7 +15,6 @@ El proyecto usa Swift, SwiftUI, Xcode 26.3 y el SDK de Firebase 12.14.0 mediante
 | `Lab14IntroFirebase/DatabaseService.swift` | Modelo de mensaje, escritura y suscripción a Cloud Firestore |
 | `Lab14IntroFirebase/MessagesView.swift` | Historial y composición de mensajes |
 | `firestore.rules` | Reglas para la colección `messages` |
-| `RESPUESTAS-LAB14.md` | Preguntas y conclusiones de la guía |
 | `evidencias/` | Capturas y registro de las comprobaciones |
 
 El chat muestra los 100 mensajes más recientes, en orden cronológico. La marca temporal la asigna el servidor y las reglas verifican que el correo y UID correspondan a la sesión autenticada.
