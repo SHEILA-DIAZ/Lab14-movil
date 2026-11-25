@@ -22,9 +22,11 @@ El chat muestra los 100 mensajes más recientes, en orden cronológico. La marca
 
 ## Configuración de Firebase
 
-1. En la consola de Firebase, crea el proyecto **App01-Lab14** con tu cuenta de Tecsup y registra una aplicación Apple con el bundle identifier indicado arriba.
-2. En **Authentication → Sign-in method**, habilita **Email/Password**.
-3. En **Firestore Database**, crea la base **(default)**. En **Rules**, pega el contenido de `firestore.rules` y publícalo. Cada usuario autenticado puede leer el chat y crear mensajes a su nombre.
+La app usa el proyecto de laboratorio existente **App01-Lab14** (`app01-lab14-b254f`), con Cloud Firestore Standard, base `(default)` en `nam5` y Authentication mediante correo y contraseña.
+
+1. En la configuración del proyecto existente, comprueba que esté registrada la app Apple con el bundle identifier indicado arriba.
+2. En **Authentication → Sign-in method**, comprueba que **Email/Password** esté habilitado.
+3. En **Firestore Database**, abre la base **(default)** y verifica que **Rules** coincida con `firestore.rules`. Cada usuario autenticado puede leer el chat y crear mensajes a su nombre.
 4. Descarga `GoogleService-Info.plist` desde la configuración de la app Apple y guárdalo en `Lab14IntroFirebase/GoogleService-Info.plist`. Xcode incluye automáticamente el plist de la carpeta del target. Git lo excluye.
 5. Abre `Lab14IntroFirebase.xcodeproj`, selecciona el esquema **Lab14IntroFirebase** y un simulador iOS. Espera a que Swift Package Manager resuelva las dependencias y ejecuta con **⌘R**.
 
@@ -40,6 +42,6 @@ xcodebuild -project Lab14IntroFirebase.xcodeproj \
 
 ## Verificación
 
-El registro de cada prueba y el vínculo a su evidencia se mantienen en [evidencias/README.md](evidencias/README.md). Las comprobaciones de integración requieren el proyecto Firebase de Tecsup, Email/Password habilitado y las reglas publicadas.
+El registro de cada prueba y el vínculo a su evidencia se mantienen en [evidencias/README.md](evidencias/README.md). El registro incluye la prueba de suplantación de remitente y el resultado observado con las reglas publicadas.
 
 Para comprobar la sesión, registra una cuenta de prueba, cierra y vuelve a abrir la app, cierra sesión y prueba una contraseña incorrecta antes de volver a entrar con las credenciales correctas. Para comprobar la mensajería, inicia sesión con dos cuentas de prueba en dos simuladores. Envía un mensaje desde cada dispositivo y verifica que el otro lo reciba sin recargar la vista. Contrasta los usuarios con la pestaña **Users** y los mensajes con el colección `messages` de **Firestore Database → Data**.

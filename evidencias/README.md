@@ -12,6 +12,7 @@ Xcode 26.3, Swift 6.2.4, Firebase SDK 12.14.0 e iPhone 17 Pro simulado con iOS 2
 | Cierre de sesión | La app volvió al formulario y mostró la confirmación. [Captura](07-cierre.png) |
 | Contraseña incorrecta | Firebase Auth rechazó las credenciales. [Captura](08-credenciales-incorrectas.png) |
 | Inicio de sesión | La app volvió a iniciar sesión con la contraseña correcta. [Captura](09-inicio.png) |
+| Chat con dos cuentas en iOS | La cuenta A envió un mensaje y la cuenta B lo recibió al iniciar su sesión. B envió su respuesta y la app mostró ambos correos de prueba. El campo se vació tras cada escritura confirmada. [Envío de A](10-mensaje-usuario-a.png) · [Conversación desde B](11-mensajes-dos-usuarios.png) |
 | Escritura, lectura cruzada y remitente en Cloud Firestore | Dos cuentas autenticadas crearon mensajes con su propio correo y UID. Cada cuenta leyó el mensaje de la otra por REST y se verificaron ambos campos contra Authentication. [Resultados del servidor](12-firestore-servidor.txt) |
 | Reglas publicadas de Cloud Firestore | El servidor rechazó lecturas anónimas, modificaciones y eliminaciones. Aceptó una escritura con el correo de otra cuenta. `firestore.rules` comprueba correo y UID contra el token y queda pendiente verificar esa versión publicada. [Resultados del servidor](12-firestore-servidor.txt) |
 
