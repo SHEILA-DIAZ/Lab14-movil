@@ -1,0 +1,18 @@
+Lectura anónima · HTTP 403
+Registro de cuenta a · HTTP 200
+Contraseña incorrecta de cuenta a · HTTP 400
+Inicio de sesión de cuenta a · HTTP 200
+Registro de cuenta b · HTTP 200
+Contraseña incorrecta de cuenta b · HTTP 400
+Inicio de sesión de cuenta b · HTTP 200
+Escritura del mensaje de cuenta a · HTTP 200
+Lectura cruzada del mensaje de cuenta a · HTTP 200
+Correo y UID del mensaje de cuenta a coinciden con Authentication
+Modificar mensaje propio · HTTP 403
+Eliminar mensaje propio · HTTP 403
+Escritura del mensaje de cuenta b · HTTP 200
+Lectura cruzada del mensaje de cuenta b · HTTP 200
+Correo y UID del mensaje de cuenta b coinciden con Authentication
+Modificar mensaje propio · HTTP 403
+Eliminar mensaje propio · HTTP 403
+Suplantación de correo · HTTP 200

@@ -1,6 +1,9 @@
   Firebase: https://github.com/firebase/firebase-ios-sdk @ 12.14.0
     Target 'Lab14IntroFirebase' in project 'Lab14IntroFirebase'
-    Target 'FirebaseDatabase' in project 'Firebase'
+    Target 'FirebaseFirestore' in project 'Firebase'
     Target 'FirebaseAuth' in project 'Firebase'
     Target 'FirebaseCore' in project 'Firebase'
 ** BUILD SUCCEEDED **
+
+CodeSign Lab14IntroFirebase.app (in target 'Lab14IntroFirebase' from project 'Lab14IntroFirebase')
+CopyPlistFile Lab14IntroFirebase.app/GoogleService-Info.plist (in target 'Lab14IntroFirebase' from project 'Lab14IntroFirebase')
